@@ -22,8 +22,9 @@ router.post('/register', check_user, async (req, res) => {
         res.status(500).json(err)
     }
 })
-router.post('/login', auth, async (req, res) => {
+router.post('/login', authorize, async (req, res) => {
     try {
+        console.log('made it here')
         const user = await db.get_user_by_username(req.body.username)
         await db.add_session(user.id)
         user
@@ -31,11 +32,12 @@ router.post('/login', auth, async (req, res) => {
         :   res.status(404).json({message: `Wrong`})
     }
     catch (err) {
+        console.log(err)
         res.status(500).json(err)
     }
 })
 //R
-router.get('/users', async (req, res) => {
+router.get('/users', restricted, async (req, res) => {
     try {
         const users = await db.get_users()
         users.length > 0
@@ -59,5 +61,14 @@ router.get('/sessions', async (req, res) => {
 })
 //U
 //D
+router.get('/logout', async (req, res) => {
+    req.session
+    ?   req.session.destroy(err => {
+            err
+            ?   res.status(500).json({message: `Can't log you out, surry.`})
+            :   res.status(200).json({message: `You were logged out. Cool.`})
+        })
+    :   res.status(200).json({message: `Try logging in first next time.`})
+})
 
 module.exports = router

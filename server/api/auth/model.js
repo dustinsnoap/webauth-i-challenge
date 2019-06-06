@@ -19,11 +19,14 @@ const get_user_by_username = async username =>
     await db('users').first().where({username})
 //U
 //D
+const logout_user = async user_id =>
+    await db('logs').first().where('user_id', user_id).del()
 
 module.exports = {
     add_user,
     add_session,
     get_users,
     get_user_by_username,
-    get_sessions
+    get_sessions,
+    logout_user,
 }
